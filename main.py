@@ -1,6 +1,14 @@
+import model.CompaniesRepository
+import view.ApplicationGUI
+import controller.Controller
+
 
 def main():
-    pass
+    companies_repo = model.CompaniesRepository.CompaniesRepository(data_path="E:\\data\\")
+    application_gui = view.ApplicationGUI.ApplicationGUI()
+    control = controller.Controller.Controller(repo=companies_repo, view=application_gui)
+    application_gui.set_ctrl(ctrl=control)
+    application_gui.mainloop()
 
 
 if __name__ == '__main__':

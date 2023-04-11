@@ -49,7 +49,7 @@ def show_xml(element: xml.etree.ElementTree.Element, depth: int = 0):
 
 
 def find_element_with_attrib(element: xml.etree.ElementTree.Element, attrib_name: str):
-    element.get(attrib_name)
+    return element.get(attrib_name)
 
 
 # count files in directory

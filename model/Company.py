@@ -1,5 +1,5 @@
-class CompanyDTO:
-    def __init__(self, full_name, inn, kpp, date_reg, region, town, street, building, phones, director, main_okved, additional_okved, status):
+class Company:
+    def __init__(self, full_name, inn, kpp, date_reg, region, town, street, building, apartments, director, main_okved, additional_okved, status):
         self.full_name = full_name
         self.inn = inn
         self.kpp = kpp
@@ -8,9 +8,10 @@ class CompanyDTO:
         self.town = town
         self.street = street
         self.building = building
-        self.phones = phones
+        self.apartments = apartments
         self.director = director
         self.main_okved = main_okved
         self.additional_okved = additional_okved
         self.status = status
+        # Прекращение юридического лица
 
