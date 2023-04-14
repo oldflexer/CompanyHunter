@@ -177,5 +177,6 @@ class CompaniesRepository(object):
 
                 yield new_company
 
-            if temp == 3:
+            if temp == 10:
                 break
+
