@@ -1,6 +1,6 @@
 class Company:
-    def __init__(self, full_name, inn, kpp, date_reg, region, town, street, building, apartments, director, main_okved, additional_okved, status):
-        self.full_name = full_name
+    def __init__(self, small_name, inn, kpp, date_reg, region, town, street, building, apartments, director, main_okved, additional_okved, status):
+        self.small_name = small_name
         self.inn = inn
         self.kpp = kpp
         self.date_reg = date_reg

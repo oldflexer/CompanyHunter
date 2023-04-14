@@ -18,5 +18,5 @@ class Controller:
     def search(self):
         self.companies = list(self.repo.get_companies(archive_index=0, controller=self))
         for company in self.companies:
-            print(company)
+            # print(company)
             self.view.add_company(company)
