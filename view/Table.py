@@ -61,31 +61,36 @@ class Table(ctk.CTkFrame):
 
     def copy_cell(self, event=None):
         selection = self.table.selection()
-        if selection:
-            row = self.table.item(selection[0])["values"]
 
-            match event:
-                case None:
-                    column = self.table.identify_column(self.cursor_x)
-                case _:
-                    column = self.table.identify_column(event.x)
+        if not selection:
+            return
 
-            column_number = int(column.lstrip("#")) - 1
-            cell = row[column_number]
+        row = self.table.item(selection[0])["values"]
 
-            self.table.clipboard_clear()
-            self.table.clipboard_append(str(cell))
+        match event:
+            case None:
+                column = self.table.identify_column(self.cursor_x)
+            case _:
+                column = self.table.identify_column(event.x)
 
-            print(self.table.clipboard_get())
+        column_number = int(column.lstrip("#")) - 1
+        cell = row[column_number]
+
+        self.table.clipboard_clear()
+        self.table.clipboard_append(str(cell))
+
+        print(self.table.clipboard_get())
 
     def copy_rows(self, event=None):
         selection = self.table.selection()
-        row = None
-        if selection:
-            self.table.clipboard_clear()
 
-            for _id in selection:
-                row = self.table.item(_id)["values"]
-                self.table.clipboard_append(str(row))
+        if not selection:
+            return
 
-            print(self.table.clipboard_get())
+        self.table.clipboard_clear()
+
+        for _id in selection:
+            row = self.table.item(_id)["values"]
+            self.table.clipboard_append(str(row))
+
+        # print(self.table.clipboard_get())

@@ -2,6 +2,7 @@ import customtkinter as ctk
 import model.Company as Company
 import view.Table as Table
 import view.Filter as Filter
+import threading
 
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("green")
@@ -13,15 +14,18 @@ class ApplicationGUI(ctk.CTk):
     def __init__(self):
         super().__init__()
         # set new window geometry, placement
+        # self.geometry(
+        #     f"{self.winfo_screenwidth() // 2}x{self.winfo_screenheight() // 2}+{self.winfo_width() // 2}+{self.winfo_height() // 2}")
+
         self.geometry(
-            f"{self.winfo_screenwidth() // 2}x{self.winfo_screenheight() // 2}+{self.winfo_width() // 2}+{self.winfo_height() // 2}")
+            f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}+{0}+{0}")
 
         # set miscellaneous properties
         self.title("Company Hunter")
         self.iconbitmap("assets/company.ico")
 
         # set font for application widgets
-        self.label_font = ctk.CTkFont(family="Calibri", size=14)
+        self.label_font = ctk.CTkFont(family="Calibri", size=16)
         self.entry_font = ctk.CTkFont(family="Calibri", size=14)
 
         # main frame that allows to drag by any part of window and master for other widgets
@@ -29,16 +33,19 @@ class ApplicationGUI(ctk.CTk):
         self.main_frame.bind(LMB, self.choose_window)
 
         # frame with filter boxes
-        self.filter_frame = Filter.Filter(master=self.main_frame, label_font=self.label_font, entry_font=self.entry_font, orientation=ctk.HORIZONTAL)
+        self.filter_frame = Filter.Filter(master=self.main_frame,
+                                          label_font=self.label_font,
+                                          entry_font=self.entry_font,
+                                          orientation=ctk.HORIZONTAL)
         self.filter_frame.bind(LMB, self.choose_window)
 
         # frame with table
         self.table_frame = Table.Table(master=self.main_frame,
                                        headings=("Название организации",
+                                                 "Почта",
                                                  "ИНН",
-                                                 "КПП",
                                                  "Дата регистрации",
-                                                 "Регион",
+                                                 "Субъект",
                                                  "Нас. пункт",
                                                  "Улица",
                                                  "Строение",
@@ -64,6 +71,7 @@ class ApplicationGUI(ctk.CTk):
         # pack table
         # self.table_frame.pack(expand=True, fill=ctk.Y, anchor=ctk.CENTER, padx=5, pady=5)
         self.table_frame.grid(row=1, column=0, sticky=ctk.NSEW)
+        # self.wm_attributes('-topmost', 1)
 
     def add_company(self, company: Company.Company):
         # for attrib in dir(company):
@@ -73,8 +81,8 @@ class ApplicationGUI(ctk.CTk):
         self.table_frame.table.insert(parent="",
                                       index=ctk.END,
                                       values=(company.small_name,
+                                              company.email,
                                               company.inn,
-                                              company.kpp,
                                               company.date_reg,
                                               company.region,
                                               company.town,
@@ -86,15 +94,23 @@ class ApplicationGUI(ctk.CTk):
                                               company.additional_okved,
                                               company.status))
 
+    def clear_table(self):
+        self.table_frame.table.delete(*self.table_frame.table.get_children())
+
     def set_ctrl(self, ctrl):
-        self.filter_frame.button_search.configure(command=ctrl.search)
         self.filter_frame.entry_full_name.configure(textvariable=ctrl.full_name)
         self.filter_frame.entry_date_reg.configure(textvariable=ctrl.date_reg)
         self.filter_frame.entry_region.configure(textvariable=ctrl.region)
         self.filter_frame.entry_town.configure(textvariable=ctrl.town)
         self.filter_frame.entry_main_okved.configure(textvariable=ctrl.main_okved)
         self.filter_frame.entry_additional_okved.configure(textvariable=ctrl.additional_okved)
+
         self.filter_frame.switch_status.configure(variable=ctrl.status)
+        self.filter_frame.switch_email.configure(variable=ctrl.email)
+
+        self.filter_frame.button_prev.configure(command=ctrl.prev_file)
+        self.filter_frame.button_next.configure(command=ctrl.next_file)
+        self.filter_frame.button_search.configure(command=ctrl.search)
 
     def choose_window(self, event):
         delta_x = self.winfo_x()

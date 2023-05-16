@@ -1,3 +1,5 @@
+import threading
+
 import model.CompaniesRepository
 import view.ApplicationGUI
 import controller.Controller
