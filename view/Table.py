@@ -1,6 +1,7 @@
 import tkinter as tk
 import customtkinter as ctk
 import tkinter.ttk as ttk
+import webbrowser
 
 
 class Table(ctk.CTkFrame):
@@ -35,12 +36,13 @@ class Table(ctk.CTkFrame):
         self.menu = tk.Menu(self.table, tearoff=0)
         self.menu.add_command(command=self.copy_cell, label="Копировать ячейку")
         self.menu.add_command(command=self.copy_rows, label="Копировать строки")
+        self.menu.add_command(command=self.search_info, label="Поиск по ИНН")
 
         self.table.bind("<Button-3>", self.popup_menu)
         self.table.bind("<Control-Key-c>", self.copy_cell)
 
-        self.scrollbar_y = ctk.CTkScrollbar(master=self, orientation=tk.constants.VERTICAL, command=self.table.yview)
-        self.scrollbar_x = ctk.CTkScrollbar(master=self, orientation=tk.constants.HORIZONTAL, command=self.table.xview)
+        self.scrollbar_y = ctk.CTkScrollbar(master=self, orientation=tk.constants.VERTICAL, command=self.table.yview, width=16)
+        self.scrollbar_x = ctk.CTkScrollbar(master=self, orientation=tk.constants.HORIZONTAL, command=self.table.xview, height=16)
 
         self.table.configure(yscrollcommand=self.scrollbar_y.set)
         self.table.configure(xscrollcommand=self.scrollbar_x.set)
@@ -50,9 +52,12 @@ class Table(ctk.CTkFrame):
         self.columnconfigure(index=0, weight=1)
         self.columnconfigure(index=1, weight=0)
 
-        self.scrollbar_y.grid(row=0, column=1, sticky=ctk.NS)
-        self.scrollbar_x.grid(row=1, column=0, sticky=ctk.EW)
-        self.table.grid(row=0, column=0, sticky=ctk.NS)
+        self.scrollbar_x.pack(side=ctk.BOTTOM, expand=False, fill=ctk.BOTH)
+        self.scrollbar_y.pack(side=ctk.RIGHT, expand=True, fill=ctk.BOTH)
+        self.table.pack(side=ctk.LEFT, expand=True, fill=ctk.BOTH)
+        # self.scrollbar_y.grid(row=0, column=1, sticky=ctk.NS)
+        # self.scrollbar_x.grid(row=1, column=0, sticky=ctk.EW)
+        # self.table.grid(row=0, column=0, sticky=ctk.NS)
 
     def popup_menu(self, event):
         self.cursor_x = event.x
@@ -79,9 +84,9 @@ class Table(ctk.CTkFrame):
         self.table.clipboard_clear()
         self.table.clipboard_append(str(cell))
 
-        print(self.table.clipboard_get())
+        # print(self.table.clipboard_get())
 
-    def copy_rows(self, event=None):
+    def copy_rows(self):
         selection = self.table.selection()
 
         if not selection:
@@ -91,6 +96,16 @@ class Table(ctk.CTkFrame):
 
         for _id in selection:
             row = self.table.item(_id)["values"]
-            self.table.clipboard_append(str(row))
+            self.table.clipboard_append("; ".join(str(cell) for cell in row) + "\n\n")
 
         # print(self.table.clipboard_get())
+
+    def search_info(self):
+        selection = self.table.selection()
+
+        if not selection:
+            return
+
+        for _id in selection:
+            row = self.table.item(_id)["values"]
+            webbrowser.open(f"https://www.list-org.com/search?type=inn&val={row[2]}", new=0)

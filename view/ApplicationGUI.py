@@ -18,7 +18,7 @@ class ApplicationGUI(ctk.CTk):
         #     f"{self.winfo_screenwidth() // 2}x{self.winfo_screenheight() // 2}+{self.winfo_width() // 2}+{self.winfo_height() // 2}")
 
         self.geometry(
-            f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}+{0}+{0}")
+            f"{self.winfo_screenwidth()}x{self.winfo_screenheight()-70}")
 
         # set miscellaneous properties
         self.title("Company Hunter")
@@ -58,20 +58,20 @@ class ApplicationGUI(ctk.CTk):
         self.table_frame.bind(LMB, self.choose_window)
 
         # pack main frame
-        self.main_frame.pack(expand=True, fill=ctk.Y)
+        self.main_frame.pack(expand=True, fill=ctk.BOTH)
 
-        self.main_frame.rowconfigure(index=0, weight=1)
-        self.main_frame.rowconfigure(index=1, weight=19)
-        self.main_frame.columnconfigure(index=0, weight=1)
+        # self.main_frame.rowconfigure(index=0, weight=1)
+        # self.main_frame.rowconfigure(index=1, weight=19)
+        # self.main_frame.columnconfigure(index=0, weight=1)
 
         # pack filter
-        # self.filter_frame.pack(expand=True, fill=ctk.X, anchor=ctk.N, padx=5, pady=5)
-        self.filter_frame.grid(row=0, column=0, sticky=ctk.NSEW)
+        self.filter_frame.pack(expand=False, fill=ctk.BOTH, padx=10, pady=10)
+        self.filter_frame.grid_all()
+        # self.filter_frame.grid(row=0, column=0, sticky=ctk.NSEW)
 
         # pack table
-        # self.table_frame.pack(expand=True, fill=ctk.Y, anchor=ctk.CENTER, padx=5, pady=5)
-        self.table_frame.grid(row=1, column=0, sticky=ctk.NSEW)
-        # self.wm_attributes('-topmost', 1)
+        self.table_frame.pack(expand=True, fill=ctk.BOTH, padx=10, pady=10)
+        # self.table_frame.grid(row=1, column=0, sticky=ctk.NSEW)
 
     def add_company(self, company: Company.Company):
         # for attrib in dir(company):
@@ -108,9 +108,14 @@ class ApplicationGUI(ctk.CTk):
         self.filter_frame.switch_status.configure(variable=ctrl.status)
         self.filter_frame.switch_email.configure(variable=ctrl.email)
 
+        self.filter_frame.button_prev_10.configure(command=ctrl.prev_file_x10)
         self.filter_frame.button_prev.configure(command=ctrl.prev_file)
-        self.filter_frame.button_next.configure(command=ctrl.next_file)
         self.filter_frame.button_search.configure(command=ctrl.search)
+        self.filter_frame.button_next.configure(command=ctrl.next_file)
+        self.filter_frame.button_next_10.configure(command=ctrl.next_file_x10)
+
+        self.filter_frame.button_settings.configure(command=ctrl.open_config_window)
+        self.filter_frame.button_xlsx.configure()
 
     def choose_window(self, event):
         delta_x = self.winfo_x()
@@ -126,8 +131,3 @@ class ApplicationGUI(ctk.CTk):
         self.main_frame.bind(LMM, move_window)
         self.filter_frame.bind(LMM, move_window)
         self.table_frame.bind(LMM, move_window)
-
-
-if __name__ == "__main__":
-    app = ApplicationGUI()
-    app.mainloop()

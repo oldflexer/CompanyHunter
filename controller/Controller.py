@@ -4,6 +4,8 @@ import time
 
 from customtkinter import StringVar, BooleanVar
 
+import view.ConfigGUI
+
 
 def short_filename(filename):
     temp = filename[::-1]
@@ -36,36 +38,71 @@ class Controller:
         self.email = BooleanVar(value=False)
 
         self.update_labels()
+        self.search()
 
     def update_labels(self):
         self.view.filter_frame.label_current_archive.configure(text=f"{self.name_current_archive} | {self.index_current_archive+1}/{len(self.list_archives)}")
         self.view.filter_frame.label_current_xml.configure(text=f"{self.name_current_xml} | {self.index_current_xml+1}/{len(self.list_xmls)}")
 
+    def prev_archive(self):
+        if self.index_current_archive >= 1:
+            self.index_current_archive -= 1
+            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.index_current_xml = len(self.list_xmls) - 1
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
+        else:
+            self.index_current_archive = len(self.list_archives) - 1
+            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.index_current_xml = len(self.list_xmls) - 1
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
+
+    def next_archive(self):
+        if self.index_current_archive < len(self.list_archives) - 1:
+            self.index_current_archive += 1
+            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.index_current_xml = 0
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
+        else:
+            self.index_current_archive = 0
+            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.index_current_xml = 0
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
+
+    def prev_file_x10(self):
+        if self.index_current_xml >= 10:
+            self.index_current_xml -= 10
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
+        else:
+            self.prev_archive()
+
     def prev_file(self):
-        if self.index_current_xml > 0:
+        if self.index_current_xml >= 1:
             self.index_current_xml -= 1
             self.name_current_xml = self.list_xmls[self.index_current_xml]
             self.search()
         else:
-            if self.index_current_archive > 0:
-                self.index_current_archive -= 1
-                self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
-                self.index_current_xml = len(self.list_xmls)
-                self.name_current_xml = self.list_xmls[self.index_current_xml]
-                self.search()
+            self.prev_archive()
+
+    def next_file_x10(self):
+        if self.index_current_xml < len(self.list_xmls) - 10:
+            self.index_current_xml += 10
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
+        else:
+            self.next_archive()
 
     def next_file(self):
-        if self.index_current_xml < len(self.list_xmls):
+        if self.index_current_xml < len(self.list_xmls) - 1:
             self.index_current_xml += 1
             self.name_current_xml = self.list_xmls[self.index_current_xml]
             self.search()
         else:
-            if self.index_current_archive < len(self.list_archives):
-                self.index_current_archive += 1
-                self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
-                self.index_current_xml = 0
-                self.name_current_xml = self.list_xmls[self.index_current_xml]
-                self.search()
+            self.next_archive()
 
     def search(self):
         self.view.clear_table()
@@ -81,3 +118,7 @@ class Controller:
             self.view.add_company(company)
 
         self.update_labels()
+
+    def open_config_window(self):
+        config_gui = view.ConfigGUI.ConfigGUI()
+        config_gui.pack_all()

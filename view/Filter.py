@@ -10,6 +10,10 @@ class Filter(ctk.CTkScrollableFrame):
         self.label_font = label_font
         self.entry_font = entry_font
 
+        # settings and save to xlsx buttons
+        self.button_settings = ctk.CTkButton(master=self, text="Настройки", font=self.label_font)
+        self.button_xlsx = ctk.CTkButton(master=self, text="Сохранить в Excel", font=self.label_font)
+
         # filter elements
         self.label_full_name = ctk.CTkLabel(master=self, text="Наименование организации",
                                             font=self.label_font)
@@ -19,10 +23,10 @@ class Filter(ctk.CTkScrollableFrame):
                                            font=self.label_font)
         self.entry_date_reg = ctk.CTkEntry(master=self, font=self.entry_font)
 
-        self.label_region = ctk.CTkLabel(master=self, text="Регион", font=self.label_font)
+        self.label_region = ctk.CTkLabel(master=self, text="Субъект", font=self.label_font)
         self.entry_region = ctk.CTkEntry(master=self, font=self.entry_font)
 
-        self.label_town = ctk.CTkLabel(master=self, text="Город", font=self.label_font)
+        self.label_town = ctk.CTkLabel(master=self, text="Нас. пункт", font=self.label_font)
         self.entry_town = ctk.CTkEntry(master=self, font=self.entry_font)
 
         self.label_main_okved = ctk.CTkLabel(master=self, text="Основной ОКВЭД",
@@ -43,62 +47,58 @@ class Filter(ctk.CTkScrollableFrame):
         self.label_current_archive = ctk.CTkLabel(master=self.info_frame, font=self.label_font)
         self.label_current_xml = ctk.CTkLabel(master=self.info_frame, font=self.label_font)
 
-        self.button_prev = ctk.CTkButton(master=self, text="<<<", font=self.label_font)
-        self.button_search = ctk.CTkButton(master=self, text="Поиск", font=self.label_font)
-        self.button_next = ctk.CTkButton(master=self, text=">>>", font=self.label_font)
+        self.button_frame = ctk.CTkFrame(master=self)
+        self.button_prev_10 = ctk.CTkButton(master=self.button_frame, text="<-10", font=self.label_font)
+        self.button_prev = ctk.CTkButton(master=self.button_frame, text="<-1", font=self.label_font)
+        self.button_search = ctk.CTkButton(master=self.button_frame, text="Поиск", font=self.label_font)
+        self.button_next = ctk.CTkButton(master=self.button_frame, text="1->", font=self.label_font)
+        self.button_next_10 = ctk.CTkButton(master=self.button_frame, text="10->", font=self.label_font)
 
-        self.widgets = [(self.label_full_name,
-                         self.entry_full_name),
-                        (self.label_date_reg,
-                         self.entry_date_reg),
-                        (self.label_region,
-                         self.entry_region),
-                        (self.label_town,
-                         self.entry_town),
-                        (self.label_main_okved,
-                         self.entry_main_okved),
-                        (self.label_additional_okved,
-                         self.entry_additional_okved),
-                        self.switch_status,
-                        self.switch_email,
-                        self.button_search,
-                        self.button_prev,
-                        self.button_next]
+        self.input_widgets = [(self.label_full_name,
+                               self.entry_full_name),
+                              (self.label_date_reg,
+                               self.entry_date_reg),
+                              (self.label_region,
+                               self.entry_region),
+                              (self.label_town,
+                               self.entry_town),
+                              (self.label_main_okved,
+                               self.entry_main_okved),
+                              (self.label_additional_okved,
+                               self.entry_additional_okved)]
 
-        for c in range(9):
-            self.columnconfigure(index=c, weight=1)
+        self.switch_widgets = [self.switch_status,
+                               self.switch_email]
 
-        for r in range(3):
-            self.rowconfigure(index=r, weight=1)
+    def grid_all(self):
+        # grid widgets
+        rows = 4
+        for row in range(rows):
+            self.rowconfigure(index=row, weight=1)
 
-        # pack elements
-        self.columnconfigure(index=0, weight=1)
+        columns = 7
+        for column in range(columns):
+            self.columnconfigure(index=column, weight=1, pad=5, minsize=self.winfo_screenwidth()//(columns+1))
 
-        self.label_full_name.grid(row=0, column=3, padx=10, sticky=ctk.SW)
-        self.entry_full_name.grid(row=1, column=3, padx=10, sticky=ctk.EW)
+        self.label_current_archive.pack(side=ctk.TOP, expand=True, anchor=ctk.E)
+        self.label_current_xml.pack(side=ctk.TOP, expand=True, anchor=ctk.E)
+        self.info_frame.grid(row=0, column=0, rowspan=2, sticky=ctk.NSEW, padx=5, pady=5)
 
-        self.label_date_reg.grid(row=0, column=4, padx=10, sticky=ctk.SW)
-        self.entry_date_reg.grid(row=1, column=4, padx=10, sticky=ctk.EW)
+        self.button_settings.grid(row=2, column=0, padx=5, pady=5)
+        self.button_xlsx.grid(row=3, column=0, padx=5, pady=5)
 
-        self.label_region.grid(row=0, column=5, padx=10, sticky=ctk.SW)
-        self.entry_region.grid(row=1, column=5, padx=10, sticky=ctk.EW)
+        for column in range(0, len(self.input_widgets)):
+            self.input_widgets[column][0].grid(row=0, column=column+1, sticky=ctk.SW, padx=5, pady=5)
 
-        self.label_town.grid(row=0, column=6, padx=10, sticky=ctk.SW)
-        self.entry_town.grid(row=1, column=6, padx=10, sticky=ctk.EW)
+        for column in range(0, len(self.input_widgets)):
+            self.input_widgets[column][1].grid(row=1, column=column+1, sticky=ctk.EW, padx=5, pady=5)
 
-        self.label_main_okved.grid(row=0, column=7, padx=10, sticky=ctk.SW)
-        self.entry_main_okved.grid(row=1, column=7, padx=10, sticky=ctk.EW)
+        for column in range(0, len(self.switch_widgets)):
+            self.switch_widgets[column].grid(row=2, column=column+1, sticky=ctk.EW, padx=5, pady=5)
 
-        self.label_additional_okved.grid(row=0, column=8, padx=10, sticky=ctk.SW)
-        self.entry_additional_okved.grid(row=1, column=8, padx=10, sticky=ctk.EW)
-
-        self.switch_status.grid(row=2, column=3, padx=10, sticky=ctk.NW)
-        self.switch_email.grid(row=2, column=4, padx=10, sticky=ctk.NW)
-
-        self.label_current_archive.pack(padx=10, anchor=ctk.SE)
-        self.label_current_xml.pack(padx=10, anchor=ctk.SE)
-        self.info_frame.grid(row=0, column=0, sticky=ctk.NSEW, rowspan=2, columnspan=3)
-
-        self.button_prev.grid(row=2, column=0, sticky=ctk.EW, padx=10)
-        self.button_search.grid(row=2, column=1, sticky=ctk.EW, padx=10)
-        self.button_next.grid(row=2, column=2, sticky=ctk.EW, padx=10)
+        self.button_prev_10.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
+        self.button_prev.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
+        self.button_search.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
+        self.button_next.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
+        self.button_next_10.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
+        self.button_frame.grid(row=3, column=1, columnspan=4, sticky=ctk.NSEW, padx=5, pady=5)
