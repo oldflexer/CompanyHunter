@@ -82,19 +82,19 @@ class Filter(ctk.CTkScrollableFrame):
 
         self.label_current_archive.pack(side=ctk.TOP, expand=True, anchor=ctk.E)
         self.label_current_xml.pack(side=ctk.TOP, expand=True, anchor=ctk.E)
-        self.info_frame.grid(row=0, column=0, rowspan=2, sticky=ctk.NSEW, padx=5, pady=5)
+        self.info_frame.grid(row=0, column=6, rowspan=2, sticky=ctk.NSEW, padx=5, pady=5)
 
-        self.button_settings.grid(row=2, column=0, padx=5, pady=5)
-        self.button_xlsx.grid(row=3, column=0, padx=5, pady=5)
-
-        for column in range(0, len(self.input_widgets)):
-            self.input_widgets[column][0].grid(row=0, column=column+1, sticky=ctk.SW, padx=5, pady=5)
+        self.button_settings.grid(row=2, column=6, padx=5, pady=5)
+        self.button_xlsx.grid(row=3, column=6, padx=5, pady=5)
 
         for column in range(0, len(self.input_widgets)):
-            self.input_widgets[column][1].grid(row=1, column=column+1, sticky=ctk.EW, padx=5, pady=5)
+            self.input_widgets[column][0].grid(row=0, column=column, sticky=ctk.SW, padx=5, pady=5)
+
+        for column in range(0, len(self.input_widgets)):
+            self.input_widgets[column][1].grid(row=1, column=column, sticky=ctk.EW, padx=5, pady=5)
 
         for column in range(0, len(self.switch_widgets)):
-            self.switch_widgets[column].grid(row=2, column=column+1, sticky=ctk.EW, padx=5, pady=5)
+            self.switch_widgets[column].grid(row=2, column=column, sticky=ctk.EW, padx=5, pady=5)
 
         self.button_prev_10.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
         self.button_prev.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)

@@ -115,7 +115,7 @@ class ApplicationGUI(ctk.CTk):
         self.filter_frame.button_next_10.configure(command=ctrl.next_file_x10)
 
         self.filter_frame.button_settings.configure(command=ctrl.open_config_window)
-        self.filter_frame.button_xlsx.configure()
+        self.filter_frame.button_xlsx.configure(command=ctrl.save_xlsx)
 
     def choose_window(self, event):
         delta_x = self.winfo_x()

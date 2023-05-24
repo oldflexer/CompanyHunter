@@ -2,7 +2,6 @@ class Company(object):
     def __init__(self):
         self.small_name = ""
         self.email = ""
-        self.kpp = ""
         self.inn = ""
         self.date_reg = ""
         self.region = ""

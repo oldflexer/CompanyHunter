@@ -7,7 +7,12 @@ import threading
 
 
 class CompaniesRepository(object):
-    def __init__(self, data_path):
+    def __init__(self):
+        self.data_path = None
+        self.directory_list = None
+        self.archive_list = None
+
+    def load_data(self, data_path):
         self.data_path = data_path
         self.directory_list = os.listdir(self.data_path)
         self.archive_list = list(self.find_archive_list())
