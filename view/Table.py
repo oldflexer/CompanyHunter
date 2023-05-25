@@ -1,7 +1,8 @@
 import tkinter as tk
-import customtkinter as ctk
 import tkinter.ttk as ttk
 import webbrowser
+
+import customtkinter as ctk
 
 
 class Table(ctk.CTkFrame):
@@ -37,6 +38,8 @@ class Table(ctk.CTkFrame):
         self.menu.add_command(command=self.copy_cell, label="Копировать ячейку")
         self.menu.add_command(command=self.copy_rows, label="Копировать строки")
         self.menu.add_command(command=self.search_info, label="Поиск по ИНН")
+        self.menu.add_command(command=self.search_info_v2, label="Поиск по ИНН 2")
+        self.menu.add_command(command=self.search_licenses, label="Поиск лицензий РПН")
 
         self.table.bind("<Button-3>", self.popup_menu)
         self.table.bind("<Control-Key-c>", self.copy_cell)
@@ -109,3 +112,23 @@ class Table(ctk.CTkFrame):
         for _id in selection:
             row = self.table.item(_id)["values"]
             webbrowser.open(f"https://www.list-org.com/search?type=inn&val={row[2]}", new=0)
+
+    def search_info_v2(self):
+        selection = self.table.selection()
+
+        if not selection:
+            return
+
+        for _id in selection:
+            row = self.table.item(_id)["values"]
+            webbrowser.open(f"https://www.innproverka.ru/search?query={row[2]}", new=0)
+
+    def search_licenses(self):
+        selection = self.table.selection()
+
+        if not selection:
+            return
+
+        for _id in selection:
+            row = self.table.item(_id)["values"]
+            webbrowser.open(f"https://license.rpn.gov.ru/rpn/license-registry?pcurrent_page=1&pper_page=20&plast_page=1&finn={row[2]}&oissuer_order_at=desc", new=0)

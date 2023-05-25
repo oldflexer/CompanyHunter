@@ -1,6 +1,4 @@
-import tkinter as tk
 import customtkinter as ctk
-import tkinter.ttk as ttk
 
 
 class Filter(ctk.CTkScrollableFrame):

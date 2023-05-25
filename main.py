@@ -1,8 +1,6 @@
-import threading
-
+import controller.Controller
 import model.CompaniesRepository
 import view.ApplicationGUI
-import controller.Controller
 
 
 def main():

@@ -1,8 +1,4 @@
 import customtkinter as ctk
-import model.Company as Company
-import view.Table as Table
-import view.Filter as Filter
-import threading
 
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("green")
@@ -15,11 +11,12 @@ class ConfigGUI(ctk.CTkToplevel):
         super().__init__()
 
         self.geometry(
-            f"{self.winfo_screenwidth() // 3}x{self.winfo_screenheight() // 3}")
+            f"{self.winfo_screenwidth() // 3}x{self.winfo_screenheight() // 3}+{self.winfo_screenwidth() // 3}+{self.winfo_screenheight() // 3}")
 
         # set miscellaneous properties
         self.title("Настройки")
-        self.iconbitmap("assets/company.ico")
+        # self.iconbitmap("assets/company.ico")
+        self.after(200, lambda: self.iconbitmap("assets/company.ico"))
         self.protocol("WM_DELETE_WINDOW", lambda: self.dismiss())
 
         # set font for application widgets

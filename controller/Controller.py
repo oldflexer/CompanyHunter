@@ -1,9 +1,6 @@
-import datetime
-import threading
-import time
 import configparser
-import xlsxwriter
 
+import xlsxwriter
 from customtkinter import StringVar, BooleanVar
 
 import view.ConfigGUI
@@ -141,6 +138,7 @@ class Controller:
             self.config.write(configfile)
 
         self.config_gui.dismiss()
+        self.repo.load_data(self.config_data_path)
 
     def save_xlsx(self):
         workbook = xlsxwriter.Workbook(f"{self.name_current_xml}.xlsx")

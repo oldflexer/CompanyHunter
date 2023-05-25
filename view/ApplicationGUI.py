@@ -1,8 +1,8 @@
 import customtkinter as ctk
+
 import model.Company as Company
-import view.Table as Table
 import view.Filter as Filter
-import threading
+import view.Table as Table
 
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("green")
@@ -18,7 +18,7 @@ class ApplicationGUI(ctk.CTk):
         #     f"{self.winfo_screenwidth() // 2}x{self.winfo_screenheight() // 2}+{self.winfo_width() // 2}+{self.winfo_height() // 2}")
 
         self.geometry(
-            f"{self.winfo_screenwidth()}x{self.winfo_screenheight()-70}")
+            f"{self.winfo_screenwidth()}x{self.winfo_screenheight()-70}+{0}+{0}")
 
         # set miscellaneous properties
         self.title("Company Hunter")

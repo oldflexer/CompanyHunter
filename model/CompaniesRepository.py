@@ -1,9 +1,8 @@
-import datetime
 import os
 from xml.etree import ElementTree
 from zipfile import ZipFile
+
 import model.Company
-import threading
 
 
 class CompaniesRepository(object):
