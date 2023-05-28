@@ -1,9 +1,13 @@
 import controller.Controller
 import model.CompaniesRepository
 import view.ApplicationGUI
+import logging
 
 
 def main():
+    logging.basicConfig(level=logging.INFO,
+                        filename=f"log/latest.log",
+                        filemode="w")
     companies_repo = model.CompaniesRepository.CompaniesRepository()
     application_gui = view.ApplicationGUI.ApplicationGUI()
     control = controller.Controller.Controller(repo=companies_repo, view=application_gui)
