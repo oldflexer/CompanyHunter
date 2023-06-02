@@ -1,6 +1,6 @@
 class Company(object):
     def __init__(self):
-        self.small_name = ""
+        self.name = ""
         self.email = ""
         self.inn = ""
         self.date_reg = ""
@@ -13,5 +13,6 @@ class Company(object):
         self.main_okved = ""
         self.additional_okved = ""
         self.status = ""
+        self.wastes_licenses = ""
         # Прекращение юридического лица
 

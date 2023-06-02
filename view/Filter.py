@@ -1,5 +1,6 @@
-import customtkinter as ctk
 import logging
+
+import customtkinter as ctk
 
 
 class Filter(ctk.CTkScrollableFrame):
@@ -12,10 +13,6 @@ class Filter(ctk.CTkScrollableFrame):
 
             self.label_font = label_font
             self.entry_font = entry_font
-
-            # settings and save to xlsx buttons
-            self.button_settings = ctk.CTkButton(master=self, text="Настройки", font=self.label_font)
-            self.button_xlsx = ctk.CTkButton(master=self, text="Сохранить в Excel", font=self.label_font)
 
             # filter elements
             self.label_full_name = ctk.CTkLabel(master=self, text="Наименование организации",
@@ -46,16 +43,24 @@ class Filter(ctk.CTkScrollableFrame):
             self.switch_email = ctk.CTkSwitch(master=self, text="Только с почтой",
                                               onvalue=True, offvalue=False, font=self.entry_font)
 
-            self.info_frame = ctk.CTkFrame(master=self)
+            # control buttons
+            self.control_frame = ctk.CTkFrame(master=self)
+            self.button_prev_10 = ctk.CTkButton(master=self.control_frame, text="<-10", font=self.label_font)
+            self.button_prev = ctk.CTkButton(master=self.control_frame, text="<-1", font=self.label_font)
+            self.button_search = ctk.CTkButton(master=self.control_frame, text="Поиск", font=self.label_font)
+            self.button_next = ctk.CTkButton(master=self.control_frame, text="1->", font=self.label_font)
+            self.button_next_10 = ctk.CTkButton(master=self.control_frame, text="10->", font=self.label_font)
+            self.button_prev_archive = ctk.CTkButton(master=self.control_frame, text="<-1", font=self.label_font)
+            self.button_next_archive = ctk.CTkButton(master=self.control_frame, text="1->", font=self.label_font)
+
+            # info labels
+            self.info_frame = ctk.CTkFrame(master=self.control_frame)
             self.label_current_archive = ctk.CTkLabel(master=self.info_frame, font=self.label_font)
             self.label_current_xml = ctk.CTkLabel(master=self.info_frame, font=self.label_font)
 
-            self.button_frame = ctk.CTkFrame(master=self)
-            self.button_prev_10 = ctk.CTkButton(master=self.button_frame, text="<-10", font=self.label_font)
-            self.button_prev = ctk.CTkButton(master=self.button_frame, text="<-1", font=self.label_font)
-            self.button_search = ctk.CTkButton(master=self.button_frame, text="Поиск", font=self.label_font)
-            self.button_next = ctk.CTkButton(master=self.button_frame, text="1->", font=self.label_font)
-            self.button_next_10 = ctk.CTkButton(master=self.button_frame, text="10->", font=self.label_font)
+            # settings and save to xlsx buttons
+            self.button_settings = ctk.CTkButton(master=self, text="Настройки", font=self.label_font)
+            self.button_xlsx = ctk.CTkButton(master=self, text="Сохранить в Excel", font=self.label_font)
 
             self.input_widgets = [(self.label_full_name,
                                    self.entry_full_name),
@@ -73,29 +78,39 @@ class Filter(ctk.CTkScrollableFrame):
             self.switch_widgets = [self.switch_status,
                                    self.switch_email]
 
+            self.buttons = [self.button_prev_10,
+                            self.button_prev,
+                            self.button_search,
+                            self.button_next,
+                            self.button_next_10,
+                            self.button_settings,
+                            self.button_xlsx,
+                            self.button_prev_archive,
+                            self.button_next_archive]
+
             self.logger.info("init successfully completed")
 
         except Exception as exception:
             self.logger.exception(exception)
 
+    def switch_buttons(self):
+        for btn in self.buttons:
+            if btn.cget("state") == "normal":
+                btn.configure(state="disabled")
+            else:
+                btn.configure(state="normal")
+
     def grid_all(self):
         try:
             self.logger.info("grid_all started")
-            # grid widgets
-            rows = 4
+            # grid widgets in filter
+            rows = 3
             for row in range(rows):
                 self.rowconfigure(index=row, weight=1)
 
-            columns = 7
+            columns = 9
             for column in range(columns):
-                self.columnconfigure(index=column, weight=1, pad=5, minsize=self.winfo_screenwidth()//(columns+1))
-
-            self.label_current_archive.pack(side=ctk.TOP, expand=True, anchor=ctk.E)
-            self.label_current_xml.pack(side=ctk.TOP, expand=True, anchor=ctk.E)
-            self.info_frame.grid(row=0, column=6, rowspan=2, sticky=ctk.NSEW, padx=5, pady=5)
-
-            self.button_settings.grid(row=2, column=6, padx=5, pady=5)
-            self.button_xlsx.grid(row=3, column=6, padx=5, pady=5)
+                self.columnconfigure(index=column, weight=1, pad=5, minsize=self.winfo_screenwidth() // (columns + 1))
 
             for column in range(0, len(self.input_widgets)):
                 self.input_widgets[column][0].grid(row=0, column=column, sticky=ctk.SW, padx=5, pady=5)
@@ -104,14 +119,34 @@ class Filter(ctk.CTkScrollableFrame):
                 self.input_widgets[column][1].grid(row=1, column=column, sticky=ctk.EW, padx=5, pady=5)
 
             for column in range(0, len(self.switch_widgets)):
-                self.switch_widgets[column].grid(row=2, column=column, sticky=ctk.EW, padx=5, pady=5)
+                self.switch_widgets[column].grid(row=1, column=column+6, sticky=ctk.EW, padx=5, pady=5)
 
-            self.button_prev_10.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
-            self.button_prev.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
-            self.button_search.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
-            self.button_next.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
-            self.button_next_10.pack(side=ctk.LEFT, expand=True, padx=5, pady=5)
-            self.button_frame.grid(row=3, column=1, columnspan=4, sticky=ctk.NSEW, padx=5, pady=5)
+            self.button_settings.grid(row=0, column=8, padx=5, pady=5)
+            self.button_xlsx.grid(row=1, column=8, padx=5, pady=5)
+
+            # grid widgets in control_frame
+            rows = 3
+            for row in range(rows):
+                self.control_frame.rowconfigure(index=row, weight=1)
+
+            columns = 5
+            for column in range(columns):
+                self.control_frame.columnconfigure(index=column, weight=1, pad=5)
+
+            self.button_prev_archive.grid(row=0, column=1, padx=5, pady=5, sticky=ctk.NE)
+            self.button_next_archive.grid(row=0, column=3, padx=5, pady=5, sticky=ctk.NW)
+
+            self.button_prev_10.grid(row=1, column=0, padx=5, pady=5, sticky=ctk.NE)
+            self.button_prev.grid(row=1, column=1, padx=5, pady=5, sticky=ctk.NE)
+            self.button_search.grid(row=2, column=2, padx=5, pady=5, sticky=ctk.N)
+            self.button_next.grid(row=1, column=3, padx=5, pady=5, sticky=ctk.NW)
+            self.button_next_10.grid(row=1, column=4, padx=5, pady=5, sticky=ctk.NW)
+
+            self.label_current_archive.grid(row=0, column=0, padx=5, pady=5, sticky=ctk.NE)
+            self.label_current_xml.grid(row=1, column=0, padx=5, pady=5, sticky=ctk.NE)
+
+            self.info_frame.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky=ctk.NS)
+            self.control_frame.grid(row=2, column=0, columnspan=10, padx=5, pady=5, sticky=ctk.NW)
 
             self.logger.info("grid_all successfully completed")
 

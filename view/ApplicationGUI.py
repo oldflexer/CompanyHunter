@@ -1,5 +1,7 @@
-import customtkinter as ctk
 import logging
+
+import customtkinter as ctk
+
 import model.Company as Company
 import view.Filter as Filter
 import view.Table as Table
@@ -61,18 +63,12 @@ class ApplicationGUI(ctk.CTk):
             # pack main frame
             self.main_frame.pack(expand=True, fill=ctk.BOTH)
 
-            # self.main_frame.rowconfigure(index=0, weight=1)
-            # self.main_frame.rowconfigure(index=1, weight=19)
-            # self.main_frame.columnconfigure(index=0, weight=1)
-
             # pack filter
-            self.filter_frame.pack(expand=False, fill=ctk.BOTH, padx=10, pady=10)
+            self.filter_frame.pack(expand=False, fill=ctk.BOTH, padx=5, pady=5, ipady=5)
             self.filter_frame.grid_all()
-            # self.filter_frame.grid(row=0, column=0, sticky=ctk.NSEW)
 
             # pack table
-            self.table_frame.pack(expand=True, fill=ctk.BOTH, padx=10, pady=10)
-            # self.table_frame.grid(row=1, column=0, sticky=ctk.NSEW)
+            self.table_frame.pack(expand=True, fill=ctk.BOTH, padx=5, pady=5)
 
             self.logger.info("init successfully completed")
 
@@ -83,7 +79,7 @@ class ApplicationGUI(ctk.CTk):
         try:
             self.table_frame.table.insert(parent="",
                                           index=ctk.END,
-                                          values=(company.small_name,
+                                          values=(company.name,
                                                   company.email,
                                                   company.inn,
                                                   company.date_reg,
@@ -125,6 +121,10 @@ class ApplicationGUI(ctk.CTk):
 
             self.filter_frame.button_settings.configure(command=ctrl.open_config_window)
             self.filter_frame.button_xlsx.configure(command=ctrl.save_xlsx)
+
+            self.filter_frame.button_prev_archive.configure(command=ctrl.prev_archive)
+            self.filter_frame.button_next_archive.configure(command=ctrl.next_archive)
+
         except Exception as exception:
             self.logger.exception(exception)
 

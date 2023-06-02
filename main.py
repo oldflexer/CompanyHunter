@@ -1,7 +1,9 @@
 import controller.Controller
+import controller.ParserRPN
 import model.CompaniesRepository
 import view.ApplicationGUI
 import logging
+import threading
 
 
 def main():

@@ -1,7 +1,8 @@
+import logging
 import tkinter as tk
 import tkinter.ttk as ttk
 import webbrowser
-import logging
+
 import customtkinter as ctk
 
 
@@ -166,7 +167,7 @@ class Table(ctk.CTkFrame):
 
             for _id in selection:
                 row = self.table.item(_id)["values"]
-                webbrowser.open(f"https://license.rpn.gov.ru/rpn/license-registry?pcurrent_page=1&pper_page=20&plast_page=1&finn={row[2]}&oissuer_order_at=desc", new=0)
+                webbrowser.open(f"https://license.rpn.gov.ru/rpn/license-registry?pcurrent_page=1&pper_page=20&plast_page=1&fstatus=active&finn={row[2]}&oissuer_order_at=desc", new=0)
 
             self.logger.info("search_licenses successfully completed")
 

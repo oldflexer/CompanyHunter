@@ -1,5 +1,6 @@
-from customtkinter import CTkScrollableFrame
 import logging
+
+from customtkinter import CTkScrollableFrame
 
 
 class ScrollableFrame(CTkScrollableFrame):

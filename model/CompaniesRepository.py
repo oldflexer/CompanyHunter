@@ -1,9 +1,26 @@
-import os
-import logging
-import time
 import model.Company
+import logging
+import os
+import threading
+import concurrent.futures
 from xml.etree import ElementTree
 from zipfile import ZipFile
+
+
+def call_with_future(func, future, args, kwargs):
+    try:
+        result = func(*args, **kwargs)
+        future.set_result(result)
+    except Exception as exception:
+        future.set_exception(exception)
+
+
+def threaded_future(func):
+    def wrapper(*args, **kwargs):
+        future = concurrent.futures.Future()
+        threading.Thread(target=call_with_future, args=(func, future, args, kwargs)).start()
+        return future
+    return wrapper
 
 
 class CompaniesRepository(object):
@@ -84,6 +101,16 @@ class CompaniesRepository(object):
         except Exception as exception:
             self.logger.exception(exception)
 
+    def find_full_name(self, company):
+        try:
+            if company.find("СвНаимЮЛ") is not None:
+                full_name = company.find("СвНаимЮЛ").get("НаимЮЛПолн")
+            else:
+                full_name = ""
+            return full_name
+        except Exception as exception:
+            self.logger.exception(exception)
+
     def find_email(self, company):
         try:
             if company.find("СвАдрЭлПочты") is not None:
@@ -151,8 +178,28 @@ class CompaniesRepository(object):
         try:
             if company.find("СвАдресЮЛ") is not None:
                 company_address_info = company.find("СвАдресЮЛ")
-                if company_address_info.find("АдресРФ").find("Город") is not None:
-                    town = company_address_info.find("АдресРФ").find("Город").get("НаимГород")
+                if company_address_info.find("АдресРФ") is not None:
+                    if company_address_info.find("АдресРФ").find("Город") is not None:
+                        town = company_address_info.find("АдресРФ").find("Город").get("НаимГород")
+                    else:
+                        town = ""
+                else:
+                    town = ""
+            else:
+                town = ""
+            return town
+        except Exception as exception:
+            self.logger.exception(exception)
+
+    def find_locality(self, company):
+        try:
+            if company.find("СвАдресЮЛ") is not None:
+                company_address_info = company.find("СвАдресЮЛ")
+                if company_address_info.find("АдресРФ") is not None:
+                    if company_address_info.find("АдресРФ").find("НаселПункт") is not None:
+                        town = company_address_info.find("АдресРФ").find("НаселПункт").get("НаимНаселПункт")
+                    else:
+                        town = ""
                 else:
                     town = ""
             else:
@@ -357,113 +404,77 @@ class CompaniesRepository(object):
         except Exception as exception:
             self.logger.exception(exception)
 
-    def get_companies(self, archive_index, xml_name, controller):
+    @threaded_future
+    def get_companies(self, archive_index, xml_name):
         try:
             self.logger.info("get_companies started")
 
-            xml_data = self.get_xml_data(archive_index, xml_name)
+            list_companies = []
 
+            xml_data = self.get_xml_data(archive_index, xml_name)
             if xml_data is None:
                 self.logger.warning("get_companies did not complete correctly")
                 return
 
             egrul_root = ElementTree.fromstring(xml_data)
-            companies = egrul_root.findall("СвЮЛ")
+            companies_xml = egrul_root.findall("СвЮЛ")
 
-            for company in companies:
+            for company_xml in companies_xml:
                 new_company = model.Company.Company()
 
-                new_company.small_name = self.find_small_name(company)
-                if controller.full_name.get() and controller.full_name.get() not in new_company.small_name:
-                    continue
+                new_company.name = self.find_small_name(company_xml)
+                if new_company.name == "":
+                    new_company.name = self.find_full_name(company_xml)
 
-                new_company.email = self.find_email(company)
-                if controller.email.get() and new_company.email == "":
-                    continue
+                new_company.email = self.find_email(company_xml)
 
-                new_company.inn = self.find_inn(company)
+                new_company.inn = self.find_inn(company_xml)
 
-                new_company.date_reg = self.find_date_reg(company)
-                if controller.date_reg.get() and controller.full_name.get() != new_company.date_reg:
-                    continue
+                new_company.date_reg = self.find_date_reg(company_xml)
 
-                match self.find_address_type(company):
+                match self.find_address_type(company_xml):
                     case "Классический":
-                        new_company.region = self.find_region(company)
-                        if controller.region.get() and controller.region.get() not in new_company.region:
-                            continue
-
-                        new_company.town = self.find_town(company)
-                        if controller.town.get() and controller.town.get() != new_company.town:
-                            continue
-
-                        new_company.street = self.find_street(company)
-                        new_company.building = self.find_building(company)
-                        new_company.apartments = self.find_apartments(company)
+                        new_company.region = self.find_region(company_xml)
+                        new_company.town = self.find_town(company_xml)
+                        if new_company.town == "":
+                            new_company.town = self.find_locality(company_xml)
+                        new_company.street = self.find_street(company_xml)
+                        new_company.building = self.find_building(company_xml)
+                        new_company.apartments = self.find_apartments(company_xml)
 
                     case "ЮЛФИАС":
-                        new_company.region = self.find_region_v2(company)
-                        if controller.region.get() and controller.region.get() not in new_company.region:
-                            continue
-
-                        new_company.town = self.find_town_v2(company)
-                        if controller.town.get() and controller.town.get() != new_company.town:
-                            continue
-
-                        new_company.street = self.find_street_v2(company)
-                        new_company.building = self.find_building_v2(company)
-                        new_company.apartments = self.find_apartments_v2(company)
+                        new_company.region = self.find_region_v2(company_xml)
+                        new_company.town = self.find_town_v2(company_xml)
+                        if new_company.town == "":
+                            new_company.town = self.find_locality(company_xml)
+                        new_company.street = self.find_street_v2(company_xml)
+                        new_company.building = self.find_building_v2(company_xml)
+                        new_company.apartments = self.find_apartments_v2(company_xml)
 
                     case _:
                         new_company.region = ""
-                        if controller.region.get() and controller.region.get() not in new_company.region:
-                            continue
-
                         new_company.town = ""
-                        if controller.town.get() and controller.town.get() != new_company.town:
-                            continue
-
                         new_company.street = ""
                         new_company.building = ""
                         new_company.apartments = ""
 
-                company_people_info = self.find_company_people_info(company)
-
+                company_people_info = self.find_company_people_info(company_xml)
                 director_surname = self.find_director_surname(company_people_info)
-                director_name = self.find_director_surname(company_people_info)
+                director_name = self.find_director_name(company_people_info)
                 director_second_name = self.find_director_second_name(company_people_info)
-
                 new_company.director = f"{director_surname} {director_name} {director_second_name}"
 
-                new_company.main_okved = self.find_main_okved(company)
-                if controller.main_okved.get() and controller.main_okved.get() not in new_company.main_okved:
-                    continue
+                new_company.main_okved = self.find_main_okved(company_xml)
 
-                new_company.additional_okved = self.find_additional_okved(company)
-                if controller.additional_okved.get():
-                    flag = False
-                    for okved in new_company.additional_okved:
-                        if controller.additional_okved.get() in okved:
-                            flag = True
-                    if not flag:
-                        continue
-
+                new_company.additional_okved = self.find_additional_okved(company_xml)
                 new_company.additional_okved = "; ".join(new_company.additional_okved)
 
-                new_company.status = self.find_company_status(company)
-                if controller.status.get() and controller.status.get() != new_company.status:
-                    continue
+                new_company.status = self.find_company_status(company_xml)
 
-                match new_company.status:
-                    case False:
-                        new_company.status = "Нет"
-                    case True:
-                        new_company.status = "Да"
-                    case _:
-                        new_company.status = "Не опр"
+                list_companies.append(new_company)
 
-                self.logger.info("get_companies successfully completed")
-                yield new_company
+            self.logger.info("get_companies successfully completed")
+            return list_companies
 
         except Exception as exception:
             self.logger.exception(exception)
