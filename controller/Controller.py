@@ -102,8 +102,6 @@ class Controller:
             self.config.read(config_path)
             self.config_data_path = self.load_data_config()
             self.config_xlsx_path = self.load_xlsx_config()
-            # self.load_data()
-            # self.search()
             self.logger.info("load_config completed correctly")
         except Exception as exception:
             self.logger.exception(exception)
@@ -417,6 +415,8 @@ class Controller:
 
             self.config_gui.dismiss()
             self.load_config("config.ini")
+            self.load_data()
+            self.search()
             self.logger.info("save_config successfully completed")
 
         except Exception as exception:
@@ -467,6 +467,11 @@ class Controller:
                             worksheet.write_url(row,
                                                 column,
                                                 url=f"https://license.rpn.gov.ru/rpn/license-registry?pcurrent_page=1&pper_page=20&plast_page=1&fstatus=active&finn={company.__getattribute__('inn')}&oissuer_order_at=desc",
+                                                string=company.__getattribute__(attr))
+                        case "name":
+                            worksheet.write_url(row,
+                                                column,
+                                                url=f"https://www.list-org.com/search?type=inn&val={company.__getattribute__('inn')}",
                                                 string=company.__getattribute__(attr))
                         case _:
                             worksheet.write(row, column, company.__getattribute__(attr))
