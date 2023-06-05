@@ -102,8 +102,8 @@ class Controller:
             self.config.read(config_path)
             self.config_data_path = self.load_data_config()
             self.config_xlsx_path = self.load_xlsx_config()
-            self.load_data()
-            self.search()
+            # self.load_data()
+            # self.search()
             self.logger.info("load_config completed correctly")
         except Exception as exception:
             self.logger.exception(exception)
@@ -119,9 +119,9 @@ class Controller:
 
     def load_xlsx_config(self):
         try:
-            self.logger.info("load_data_config started")
+            self.logger.info("load_xlsx_config started")
             config_xlsx_path = self.config["Excel"]["savepath"]
-            self.logger.info("load_data_config completed correctly")
+            self.logger.info("load_xlsx_config completed correctly")
             return config_xlsx_path
         except Exception as exception:
             self.logger.exception(exception)
@@ -156,19 +156,16 @@ class Controller:
 
             if self.index_current_archive >= 1:
                 self.index_current_archive -= 1
-                self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
-                self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
-                self.index_current_xml = len(self.list_xmls) - 1
-                self.name_current_xml = self.list_xmls[self.index_current_xml]
-                self.search()
             else:
                 self.index_current_archive = len(self.list_archives) - 1
-                self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
-                self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
-                self.index_current_xml = len(self.list_xmls) - 1
-                self.name_current_xml = self.list_xmls[self.index_current_xml]
-                self.search()
+
+            self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
+            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.index_current_xml = len(self.list_xmls) - 1
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
             self.logger.info("prev_archive successfully completed")
+
         except Exception as exception:
             self.logger.exception(exception)
 
@@ -183,18 +180,16 @@ class Controller:
             if self.index_current_archive < len(self.list_archives) - 1:
                 self.index_current_archive += 1
                 self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
-                self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
-                self.index_current_xml = 0
-                self.name_current_xml = self.list_xmls[self.index_current_xml]
-                self.search()
             else:
                 self.index_current_archive = 0
                 self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
-                self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
-                self.index_current_xml = 0
-                self.name_current_xml = self.list_xmls[self.index_current_xml]
-                self.search()
+
+            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.index_current_xml = 0
+            self.name_current_xml = self.list_xmls[self.index_current_xml]
+            self.search()
             self.logger.info("next_archive successfully completed")
+
         except Exception as exception:
             self.logger.exception(exception)
 
@@ -212,7 +207,9 @@ class Controller:
                 self.search()
             else:
                 self.prev_archive()
+
             self.logger.info("prev_file_x10 successfully completed")
+
         except Exception as exception:
             self.logger.exception(exception)
 
@@ -230,7 +227,9 @@ class Controller:
                 self.search()
             else:
                 self.prev_archive()
+
             self.logger.info("prev_file successfully completed")
+
         except Exception as exception:
             self.logger.exception(exception)
 
@@ -248,7 +247,9 @@ class Controller:
                 self.search()
             else:
                 self.next_archive()
+
             self.logger.info("next_file_x10 successfully completed")
+
         except Exception as exception:
             self.logger.exception(exception)
 
@@ -266,7 +267,9 @@ class Controller:
                 self.search()
             else:
                 self.next_archive()
+
             self.logger.info("next_file successfully completed")
+
         except Exception as exception:
             self.logger.exception(exception)
 
@@ -287,7 +290,7 @@ class Controller:
                 if self.email.get() and company.email == "":
                     continue
 
-                if self.date_reg.get() and self.full_name.get() != company.date_reg:
+                if self.date_reg.get() and self.date_reg.get() != company.date_reg:
                     continue
 
                 if self.region.get() and self.region.get() not in company.region:
@@ -360,6 +363,7 @@ class Controller:
             self.logger.exception(exception)
             self.view.filter_frame.switch_buttons()
 
+    @threaded
     def open_config_window(self):
         try:
             self.logger.info("open_config_window started")
