@@ -3,7 +3,7 @@ import requests
 import json
 
 
-class ParserRPN:
+class RosprirodnadzorAPI:
     def __init__(self):
         try:
             self.logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class ParserRPN:
         except Exception as exception:
             self.logger.exception(exception)
 
-    def parse_RPN(self, company):
+    def get_response(self, company):
         try:
             self.logger.info("parse_RPN started")
             self.request_url = "https://license.rpn.gov.ru/api/svc/license-activity-waste/registry/open?"
@@ -31,3 +31,4 @@ class ParserRPN:
             return response_dict
         except Exception as exception:
             self.logger.exception(exception)
+            return None

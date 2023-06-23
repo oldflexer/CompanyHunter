@@ -86,9 +86,9 @@ class ConfigGUI(ctk.CTkToplevel):
         except Exception as exception:
             self.logger.exception(exception)
 
-    def set_ctrl(self, ctrl):
+    def set_controller(self, controller):
         try:
-            self.button_save.configure(command=ctrl.save_config)
+            self.button_save.configure(command=controller.save_config)
         except Exception as exception:
             self.logger.exception(exception)
 

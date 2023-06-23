@@ -110,7 +110,7 @@ class Filter(ctk.CTkScrollableFrame):
 
             columns = 9
             for column in range(columns):
-                self.columnconfigure(index=column, weight=1, pad=5, minsize=self.winfo_screenwidth() // (columns + 1))
+                self.columnconfigure(index=column, weight=1, pad=5, minsize=self.winfo_screenwidth() // columns - columns // 2)
 
             for column in range(0, len(self.input_widgets)):
                 self.input_widgets[column][0].grid(row=0, column=column, sticky=ctk.SW, padx=5, pady=5)
@@ -121,8 +121,8 @@ class Filter(ctk.CTkScrollableFrame):
             for column in range(0, len(self.switch_widgets)):
                 self.switch_widgets[column].grid(row=1, column=column+6, sticky=ctk.EW, padx=5, pady=5)
 
-            self.button_settings.grid(row=0, column=8, padx=5, pady=5)
-            self.button_xlsx.grid(row=1, column=8, padx=5, pady=5)
+            self.button_settings.grid(row=0, column=8, padx=5, pady=5, sticky=ctk.E)
+            self.button_xlsx.grid(row=1, column=8, padx=5, pady=5, sticky=ctk.E)
 
             # grid widgets in control_frame
             rows = 3

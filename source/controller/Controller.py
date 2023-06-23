@@ -1,9 +1,9 @@
 import configparser
 import xlsxwriter
-import view.ConfigGUI
+import source.view.ConfigGUI
 import logging
 import os
-import controller.ParserRPN
+import source.controller.RosprirodnadzorAPI
 import threading
 import concurrent.futures
 from customtkinter import StringVar, BooleanVar, ThemeManager
@@ -44,7 +44,8 @@ class Controller:
         try:
             self.logger = logging.getLogger(__name__)
             self.logger.info("init started")
-            self.repo = repo
+
+            self.repository = repo
             self.view = view
             self.config_gui = None
             self.list_companies = []
@@ -58,7 +59,7 @@ class Controller:
             self.status = BooleanVar(value=True)
             self.email = BooleanVar(value=False)
 
-            self.config = configparser.ConfigParser()
+            self.config_parser = configparser.ConfigParser()
             self.config_data_path = None
             self.config_xlsx_path = None
             self.load_config(config_path)
@@ -79,13 +80,13 @@ class Controller:
             self.logger.exception(exception)
 
     def load_data(self):
-        self.repo.load_data(self.config_data_path)
-        self.list_archives = self.repo.archive_list
+        self.repository.load_data(self.config_data_path)
+        self.list_archives = self.repository.archive_list
         self.index_current_archive = 0
 
         if self.list_archives is not None:
             self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
-            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.list_xmls = self.repository.find_xml_list(self.index_current_archive)
             self.index_current_xml = 0
             self.name_current_xml = self.list_xmls[self.index_current_xml]
         else:
@@ -99,7 +100,7 @@ class Controller:
     def load_config(self, config_path):
         try:
             self.logger.info("load_config started")
-            self.config.read(config_path)
+            self.config_parser.read(config_path)
             self.config_data_path = self.load_data_config()
             self.config_xlsx_path = self.load_xlsx_config()
             self.logger.info("load_config completed correctly")
@@ -109,7 +110,7 @@ class Controller:
     def load_data_config(self):
         try:
             self.logger.info("load_data_config started")
-            config_data_path = self.config["Repository"]["datapath"]
+            config_data_path = self.config_parser["Repository"]["datapath"]
             self.logger.info("load_data_config completed correctly")
             return config_data_path
         except Exception as exception:
@@ -118,7 +119,7 @@ class Controller:
     def load_xlsx_config(self):
         try:
             self.logger.info("load_xlsx_config started")
-            config_xlsx_path = self.config["Excel"]["savepath"]
+            config_xlsx_path = self.config_parser["Excel"]["savepath"]
             self.logger.info("load_xlsx_config completed correctly")
             return config_xlsx_path
         except Exception as exception:
@@ -131,12 +132,14 @@ class Controller:
             if self.name_current_archive is None or self.index_current_archive is None or self.list_archives is None:
                 self.logger.warning("update_labels did not complete correctly")
                 return
+
             self.view.filter_frame.label_current_archive.configure(
                 text=f"{self.name_current_archive} | {self.index_current_archive + 1}/{len(self.list_archives)}")
 
             if self.name_current_xml is None or self.index_current_xml is None or self.list_xmls is None:
                 self.logger.warning("update_labels did not complete correctly")
                 return
+
             self.view.filter_frame.label_current_xml.configure(
                 text=f"{self.name_current_xml} | {self.index_current_xml + 1}/{len(self.list_xmls)}")
 
@@ -158,7 +161,7 @@ class Controller:
                 self.index_current_archive = len(self.list_archives) - 1
 
             self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
-            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.list_xmls = self.repository.find_xml_list(self.index_current_archive)
             self.index_current_xml = len(self.list_xmls) - 1
             self.name_current_xml = self.list_xmls[self.index_current_xml]
             self.search()
@@ -177,12 +180,11 @@ class Controller:
 
             if self.index_current_archive < len(self.list_archives) - 1:
                 self.index_current_archive += 1
-                self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
             else:
                 self.index_current_archive = 0
-                self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
 
-            self.list_xmls = self.repo.find_xml_list(self.index_current_archive)
+            self.name_current_archive = shorten_filename(self.list_archives[self.index_current_archive].filename)
+            self.list_xmls = self.repository.find_xml_list(self.index_current_archive)
             self.index_current_xml = 0
             self.name_current_xml = self.list_xmls[self.index_current_xml]
             self.search()
@@ -344,7 +346,7 @@ class Controller:
             self.view.filter_frame.switch_buttons()
             self.view.clear_table()
             self.update_labels()
-            self.list_companies = self.repo.get_companies(archive_index=self.index_current_archive, xml_name=self.name_current_xml).result()
+            self.list_companies = self.repository.get_companies(archive_index=self.index_current_archive, xml_name=self.name_current_xml).result()
             self.list_companies = self.filter_companies().result()
 
             if self.list_companies is None:
@@ -365,8 +367,8 @@ class Controller:
     def open_config_window(self):
         try:
             self.logger.info("open_config_window started")
-            self.config_gui = view.ConfigGUI.ConfigGUI()
-            self.config_gui.set_ctrl(self)
+            self.config_gui = source.view.ConfigGUI.ConfigGUI()
+            self.config_gui.set_controller(self)
             self.config_gui.entry_data_path.insert(0, self.config_data_path)
             self.config_gui.entry_xlsx_path.insert(0, self.config_xlsx_path)
             self.config_gui.pack_all()
@@ -380,10 +382,10 @@ class Controller:
         try:
             self.logger.info("save_config started")
 
-            self.config_data_path = self.config_gui.entry_data_path.get()
-            self.config_xlsx_path = self.config_gui.entry_xlsx_path.get()
+            config_data_path = self.config_gui.entry_data_path.get()
+            config_xlsx_path = self.config_gui.entry_xlsx_path.get()
 
-            match os.path.isdir(self.config_data_path), os.path.isdir(self.config_xlsx_path):
+            match os.path.isdir(config_data_path), os.path.isdir(config_xlsx_path):
                 case False, False:
                     self.config_gui.entry_data_path.configure(border_color="RED")
                     self.config_gui.entry_xlsx_path.configure(border_color="RED")
@@ -407,11 +409,14 @@ class Controller:
                     self.config_gui.entry_xlsx_path.configure(
                         border_color=ThemeManager.theme["CTkEntry"]["border_color"])
 
-            self.config["Repository"]["datapath"] = self.config_data_path
-            self.config["Excel"]["savepath"] = self.config_xlsx_path
+            self.config_data_path = config_data_path
+            self.config_xlsx_path = config_xlsx_path
+
+            self.config_parser["Repository"]["datapath"] = self.config_data_path
+            self.config_parser["Excel"]["savepath"] = self.config_xlsx_path
 
             with open("config.ini", "w") as configfile:
-                self.config.write(configfile)
+                self.config_parser.write(configfile)
 
             self.config_gui.dismiss()
             self.load_config("config.ini")
@@ -446,20 +451,30 @@ class Controller:
                 raise Exception
 
             for company in self.list_companies:
-                parser = controller.ParserRPN.ParserRPN()
-                response_dict = parser.parse_RPN(company)
+                parser = source.controller.RosprirodnadzorAPI.RosprirodnadzorAPI()
+                response_dict = parser.get_response(company)
 
                 wastes_licenses = []
-                for waste_license in response_dict["data"]:
-                    for place in waste_license["places_summary"]:
-                        wastes_licenses.append(f"Тип: {place['name']}; Классы: {','.join(place['classes'])}; Кол-во ФККО: {place['fkkos']}")
+                wastes_licenses_numbers = []
+                if response_dict is not None:
+                    for waste_license in response_dict["data"]:
+                        for place in waste_license["places_summary"]:
+                            wastes_licenses.append(f"Тип: {place['name']}; Классы: {','.join(place['classes'])}; Кол-во ФККО: {place['fkkos']}")
+                        wastes_licenses_numbers.append(f"{waste_license['number']}")
+                else:
+                    wastes_licenses.append(f"Нет")
 
                 if len(wastes_licenses) == 0:
                     wastes_licenses.append("Нет")
 
+                if len(wastes_licenses_numbers) == 0:
+                    wastes_licenses_numbers.append("")
+
                 wastes_licenses = "| ".join(wastes_licenses)
+                wastes_licenses_numbers = "; ".join(wastes_licenses_numbers)
 
                 company.wastes_licenses = wastes_licenses
+                company.wastes_licenses_numbers = wastes_licenses_numbers
 
                 for attr in company.__dict__.keys():
                     match attr:

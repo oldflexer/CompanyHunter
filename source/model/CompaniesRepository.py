@@ -29,7 +29,7 @@ class CompaniesRepository(object):
             self.logger = logging.getLogger(__name__)
             self.logger.info("init started")
             self.data_path = None
-            self.directory_list = None
+            self.directory_list = []
             self.archive_list = None
             self.logger.info("init successfully completed")
         except Exception as exception:
@@ -45,7 +45,7 @@ class CompaniesRepository(object):
                 self.archive_list = list(self.find_archive_list())
                 self.logger.info("load_data successfully completed")
             else:
-                self.directory_list = None
+                self.directory_list = []
                 self.archive_list = None
                 self.logger.warning("load_data did not completed correctly")
 

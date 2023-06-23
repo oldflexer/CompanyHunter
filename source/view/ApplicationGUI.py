@@ -2,9 +2,9 @@ import logging
 
 import customtkinter as ctk
 
-import model.Company as Company
-import view.Filter as Filter
-import view.Table as Table
+import source.model.Company as Company
+import source.view.Filter as Filter
+import source.view.Table as Table
 
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("green")
@@ -101,29 +101,29 @@ class ApplicationGUI(ctk.CTk):
         except Exception as exception:
             self.logger.exception(exception)
 
-    def set_ctrl(self, ctrl):
+    def set_controller(self, controller):
         try:
-            self.filter_frame.entry_full_name.configure(textvariable=ctrl.full_name)
-            self.filter_frame.entry_date_reg.configure(textvariable=ctrl.date_reg)
-            self.filter_frame.entry_region.configure(textvariable=ctrl.region)
-            self.filter_frame.entry_town.configure(textvariable=ctrl.town)
-            self.filter_frame.entry_main_okved.configure(textvariable=ctrl.main_okved)
-            self.filter_frame.entry_additional_okved.configure(textvariable=ctrl.additional_okved)
+            self.filter_frame.entry_full_name.configure(textvariable=controller.full_name)
+            self.filter_frame.entry_date_reg.configure(textvariable=controller.date_reg)
+            self.filter_frame.entry_region.configure(textvariable=controller.region)
+            self.filter_frame.entry_town.configure(textvariable=controller.town)
+            self.filter_frame.entry_main_okved.configure(textvariable=controller.main_okved)
+            self.filter_frame.entry_additional_okved.configure(textvariable=controller.additional_okved)
 
-            self.filter_frame.switch_status.configure(variable=ctrl.status)
-            self.filter_frame.switch_email.configure(variable=ctrl.email)
+            self.filter_frame.switch_status.configure(variable=controller.status)
+            self.filter_frame.switch_email.configure(variable=controller.email)
 
-            self.filter_frame.button_prev_10.configure(command=ctrl.prev_file_x10)
-            self.filter_frame.button_prev.configure(command=ctrl.prev_file)
-            self.filter_frame.button_search.configure(command=ctrl.search)
-            self.filter_frame.button_next.configure(command=ctrl.next_file)
-            self.filter_frame.button_next_10.configure(command=ctrl.next_file_x10)
+            self.filter_frame.button_prev_10.configure(command=controller.prev_file_x10)
+            self.filter_frame.button_prev.configure(command=controller.prev_file)
+            self.filter_frame.button_search.configure(command=controller.search)
+            self.filter_frame.button_next.configure(command=controller.next_file)
+            self.filter_frame.button_next_10.configure(command=controller.next_file_x10)
 
-            self.filter_frame.button_settings.configure(command=ctrl.open_config_window)
-            self.filter_frame.button_xlsx.configure(command=ctrl.save_xlsx)
+            self.filter_frame.button_settings.configure(command=controller.open_config_window)
+            self.filter_frame.button_xlsx.configure(command=controller.save_xlsx)
 
-            self.filter_frame.button_prev_archive.configure(command=ctrl.prev_archive)
-            self.filter_frame.button_next_archive.configure(command=ctrl.next_archive)
+            self.filter_frame.button_prev_archive.configure(command=controller.prev_archive)
+            self.filter_frame.button_next_archive.configure(command=controller.next_archive)
 
         except Exception as exception:
             self.logger.exception(exception)

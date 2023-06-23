@@ -14,5 +14,6 @@ class Company(object):
         self.additional_okved = ""
         self.status = ""
         self.wastes_licenses = ""
+        self.wastes_licenses_numbers = ""
         # Прекращение юридического лица
 
